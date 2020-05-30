@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<title>Movie API</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl"> 
+	<table border="1px">
+	  <tr ng-repeat="x in myWelcome">
+	  	<td>{{ x.id }}</td>
+	  	<td><img ng-src="https://image.tmdb.org/t/p/original{{x.poster_path}}" style="height:100px; width: 100px;"></td>
+	    <td>{{ x.original_title }}</td>
+	    <td>{{ x.vote_average }}</td>
+	  </tr>
+	</table>
+</div>
+
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+  $http.get("https://api.themoviedb.org/3/movie/top_rated?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=2")
+  .then(function(response) {
+      $scope.myWelcome = response.data.results;
+  });
+});
+</script>
+
+</body>
+</html>

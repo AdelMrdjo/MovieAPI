@@ -11,7 +11,7 @@
 <body ng-app="myApp" ng-controller="myCtrl">
 	<!-- <div class="cover"><img src="background.jpg"></div> -->
 	<div class="container">
-		<div class="card" ng-repeat="x in myWelcome | limitTo: 6">
+		<div class="card" ng-repeat="x in myWelcome.results | limitTo: limit">
 			<div class="logo"><img ng-src="https://image.tmdb.org/t/p/original{{x.poster_path}}"></div>
 			<div class="contentBx">
 				<h2>{{x.original_title}}</h2>
@@ -21,26 +21,42 @@
 		</div>
 	</div>
 	<div class="movieInfo">
-		<button>X</button>
+		<button ng-click="closeTab()">X</button>
 		<img ng-src="https://image.tmdb.org/t/p/original{{oneVideo.poster_path}}">
-		<h3>{{oneVideo.original_title}}</h3>
+		<h3>{{oneVideo.original_title}} [{{oneVideo.release_date}}]</h3>
 		<span ng-repeat="genr in oneVideo.genres">{{genr.name}}</span>
 		<p>{{oneVideo.overview}}</p>
 	</div>
+	<div ng-if="limit == 6" class="load"><button ng-click="loadMore()">Load more...</button></div>
 	<script>
 		var app = angular.module('myApp', []);
 		app.controller('myCtrl', function($scope, $http) {
-		  $http.get("https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=1")
+			$scope.limit = 6;
+		  	$http.get("https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=1")
 		  		.then(function(response) {
-		      		$scope.myWelcome = response.data.results;
-		      		console.log(response.data.results);
-		  });
-		  $scope.myFunc = function(id){
-		  	$http.get(`https://api.themoviedb.org/3/movie/${id}?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
+		      		$scope.myWelcome = response.data;
+		      		console.log(response.data);
+
+		  	});
+		  	$scope.myFunc = function(id){
+		  		$http.get(`https://api.themoviedb.org/3/movie/${id}?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
 		  		.then(function(response) {
 		      		$scope.oneVideo = response.data;
+		      		$scope.oneVideo.release_date = $scope.giveMeOnlyYear(response.data.release_date);
 		      		//console.log(response.data.genres);
+		      		if($(".movieInfo").width() == 0) $(".movieInfo").animate({width: '350px'},"fast");
 		  		});
+		  	}
+		  	$scope.giveMeOnlyYear = function(date){
+		  		var res = date.split("-");
+		  		return res[0];
+		  	}
+		  	$scope.closeTab = function(){
+		  		$(".movieInfo").animate({width: '0px'},"fast");
+		  	}
+		  	$scope.loadMore = function(){
+		  		$scope.limit = 20;
+		  		//$(".load").remove();
 		  	}
 		});
 	</script>

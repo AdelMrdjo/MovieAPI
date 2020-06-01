@@ -10,12 +10,25 @@
 </head>
 <body ng-app="myApp" ng-controller="myCtrl">
 	<!-- <div class="cover"><img src="background.jpg"></div> -->
+	<div class="pagination">
+		<button ng-if="currentPage != pg1" ng-click="newPage(pg1)">{{pg1}}</button>
+		<span ng-if="currentPage == pg1">{{pg1}}</span>
+		<button ng-if="currentPage != pg2" ng-click="newPage(pg2)">{{pg2}}</button>
+		<span ng-if="currentPage == pg2">{{pg2}}</span>
+		<button ng-if="currentPage != pg3" ng-click="newPage(pg3)">{{pg3}}</button>
+		<span ng-if="currentPage == pg3">{{pg3}}</span>
+		<button ng-if="currentPage != pg4" ng-click="newPage(pg4)">{{pg4}}</button>
+		<span ng-if="currentPage == pg4">{{pg4}}</span>
+		<button ng-if="currentPage != pg5" ng-click="newPage(pg5)">{{pg5}}</button>
+		<span ng-if="currentPage == pg5">{{pg5}}</span>
+	</div>
 	<div class="container">
 		<div class="card" ng-repeat="x in myWelcome.results | limitTo: limit">
 			<div class="logo"><img ng-src="https://image.tmdb.org/t/p/original{{x.poster_path}}"></div>
 			<div class="contentBx">
 				<h2>{{x.original_title}}</h2>
-				<p>Language: {{x.original_language}}</p>
+				<p>Language <span>{{x.original_language}}</span></p>
+				<p>Rating <span>{{x.vote_average | number:1}}</span></p>
 				<button ng-click="myFunc(x.id)">Read more</button>
 			</div>
 		</div>
@@ -24,10 +37,26 @@
 		<button ng-click="closeTab()">X</button>
 		<img ng-src="https://image.tmdb.org/t/p/original{{oneVideo.poster_path}}">
 		<h3>{{oneVideo.original_title}} [{{oneVideo.release_date}}]</h3>
-		<span ng-repeat="genr in oneVideo.genres">{{genr.name}}</span>
-		<p>{{oneVideo.overview}}</p>
+		<span ng-repeat="genr in oneVideo.genres" id="genr">{{genr.name}}</span>
+		<p class="overview">{{oneVideo.overview}}</p>
+		<hr>
+		<p>Popularity <span>{{oneVideo.popularity}}</span></p>
+		<p>Language <span>{{oneVideo.original_language}}</span></p>
+		<p>Rating <span>{{oneVideo.vote_average | number:1}}</span></p>
 	</div>
 	<div ng-if="limit == 6" class="load"><button ng-click="loadMore()">Load more...</button></div>
+	<div ng-if="limit != 6" class="pagination">
+		<button ng-if="currentPage != pg1" ng-click="newPage(pg1)">{{pg1}}</button>
+		<span ng-if="currentPage == pg1">{{pg1}}</span>
+		<button ng-if="currentPage != pg2" ng-click="newPage(pg2)">{{pg2}}</button>
+		<span ng-if="currentPage == pg2">{{pg2}}</span>
+		<button ng-if="currentPage != pg3" ng-click="newPage(pg3)">{{pg3}}</button>
+		<span ng-if="currentPage == pg3">{{pg3}}</span>
+		<button ng-if="currentPage != pg4" ng-click="newPage(pg4)">{{pg4}}</button>
+		<span ng-if="currentPage == pg4">{{pg4}}</span>
+		<button ng-if="currentPage != pg5" ng-click="newPage(pg5)">{{pg5}}</button>
+		<span ng-if="currentPage == pg5">{{pg5}}</span>
+	</div>
 	<script>
 		var app = angular.module('myApp', []);
 		app.controller('myCtrl', function($scope, $http) {
@@ -37,6 +66,33 @@
 		      		$scope.myWelcome = response.data;
 		      		console.log(response.data);
 
+		      		$scope.refreshPagination = function(page){
+		      			$scope.currentPage = page;
+		      			if($scope.currentPage > 0 && $scope.currentPage < 4){
+			      			$scope.pg1 = 1;
+			      			$scope.pg2 = 2;
+			      			$scope.pg3 = 3;
+			      			$scope.pg4 = 4;
+			      			$scope.pg5 = 5;
+			      		}else{
+			      			$scope.pg1 = $scope.currentPage-2;
+			      			$scope.pg2 = $scope.currentPage-1;
+			      			$scope.pg3 = $scope.currentPage;
+			      			$scope.pg4 = $scope.currentPage+1;
+			      			$scope.pg5 = $scope.currentPage+2;
+			      		}
+		      		}
+		      		$scope.currentPage = 1;
+		      		$scope.refreshPagination($scope.currentPage);
+		      		$scope.newPage = function(page){
+		      			$scope.limit = 6;
+		      			$scope.currentPage = page;
+		      			$scope.refreshPagination($scope.currentPage);
+		      			$http.get(`https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=${page}`)
+		  				.then(function(response) {
+		      					$scope.myWelcome = response.data;
+		      			});
+		      		}
 		  	});
 		  	$scope.myFunc = function(id){
 		  		$http.get(`https://api.themoviedb.org/3/movie/${id}?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)

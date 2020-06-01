@@ -4,6 +4,12 @@
 	padding:0;
 	box-sizing:border-box;
 	font-family: 'Poppins', sans-serif;
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none; /* Safari */
+	-khtml-user-select: none; /* Konqueror HTML */
+	-moz-user-select: none; /* Old versions of Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none;
 }
 body{
 	min-height: 100vh;
@@ -70,6 +76,9 @@ body{
 	text-align: left;
 	margin-left:8px;
 }
+.container .card .contentBx p span{
+	color:#03a9f4;
+}
 .container .card .contentBx button{
 	display: inline-block;
 	border:none;
@@ -133,7 +142,7 @@ body{
 	overflow: hidden;
 	text-align: left;
 	margin-left:8px;
-	margin-top:-50px;
+	margin-top:-45px;
 }
 .movieInfo img{
 	width: 100%;
@@ -145,11 +154,19 @@ body{
 .movieInfo p{
 	color:#868686;
 	text-align: left;
+	margin:8px
+}
+.movieInfo p span{
+	color:#03a9f4;
+}
+.movieInfo p.overview{
+	color:#868686;
+	text-align: left;
 	margin-left:8px;
 	margin-right: 8px;
-	margin-top:8px;
+	margin-top:12px;
 }
-.movieInfo span{
+.movieInfo span#genr{
 	background:#03a9f4;
 	color:#fff;
 	margin-left:5px;
@@ -159,14 +176,16 @@ body{
 	font-size: 13px;
 	display: inline-block;
 }
+.movieInfo hr{
+	width: 95%;
+	margin:10px auto;
+	border:1px solid #03a9f4;
+}
 /*==============================================================*/
 .load{
 	margin:30px 0px;
 }
 .load button{
-	position: relative;
-	top:10px;
-	right: 10px;
 	border: none;
 	outline:none;
 	background: transparent;
@@ -185,8 +204,33 @@ body{
 				inset 2px 2px 6px rgba(0,0,0,0.8);
 }
 /*==============================================================*/
+.pagination{
+	width: 1100px;
+	margin:20px auto;
+	padding:0px 20px;
+}
+.pagination button,.pagination span{
+	border: none;
+	outline:none;
+	background: transparent;
+	border-radius: 10px;
+	color:#c7c7c7;
+	padding:10px 20px;
+	font-size: 16px;
+	box-shadow: -2px -2px 6px rgba(255,255,255,0.05),
+				2px 2px 6px rgba(0,0,0,0.8);
+}
+.pagination span{
+	color:#03a9f4;
+}
+.pagination button:hover{
+	cursor: pointer;
+	box-shadow: inset -2px -2px 6px rgba(255,255,255,0.1),
+				inset 2px 2px 6px rgba(0,0,0,0.8);
+}
+/*==============================================================*/
 /* Hide scrollbar for Chrome, Safari and Opera */
-.movieInfo::-webkit-scrollbar {
+.movieInfo::-webkit-scrollbar,body::-webkit-scrollbar {
   display: none;
 }
 

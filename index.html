@@ -1,31 +1,48 @@
 <!DOCTYPE html>
 <html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<title>Movie API</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-<body>
-
-<div ng-app="myApp" ng-controller="myCtrl"> 
-	<table border="1px">
-	  <tr ng-repeat="x in myWelcome">
-	  	<td>{{ x.id }}</td>
-	  	<td><img ng-src="https://image.tmdb.org/t/p/original{{x.poster_path}}" style="height:100px; width: 100px;"></td>
-	    <td>{{ x.original_title }}</td>
-	    <td>{{ x.vote_average }}</td>
-	  </tr>
-	</table>
-</div>
-
-
-<script>
-var app = angular.module('myApp', []);
-app.controller('myCtrl', function($scope, $http) {
-  $http.get("https://api.themoviedb.org/3/movie/top_rated?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=2")
-  .then(function(response) {
-      $scope.myWelcome = response.data.results;
-  });
-});
-</script>
-
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+	<!-- <div class="cover"><img src="background.jpg"></div> -->
+	<div class="container">
+		<div class="card" ng-repeat="x in myWelcome | limitTo: 6">
+			<div class="logo"><img ng-src="https://image.tmdb.org/t/p/original{{x.poster_path}}"></div>
+			<div class="contentBx">
+				<h2>{{x.original_title}}</h2>
+				<p>Language: {{x.original_language}}</p>
+				<button ng-click="myFunc(x.id)">Read more</button>
+			</div>
+		</div>
+	</div>
+	<div class="movieInfo">
+		<button>X</button>
+		<img ng-src="https://image.tmdb.org/t/p/original{{oneVideo.poster_path}}">
+		<h3>{{oneVideo.original_title}}</h3>
+		<span ng-repeat="genr in oneVideo.genres">{{genr.name}}</span>
+		<p>{{oneVideo.overview}}</p>
+	</div>
+	<script>
+		var app = angular.module('myApp', []);
+		app.controller('myCtrl', function($scope, $http) {
+		  $http.get("https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=1")
+		  		.then(function(response) {
+		      		$scope.myWelcome = response.data.results;
+		      		console.log(response.data.results);
+		  });
+		  $scope.myFunc = function(id){
+		  	$http.get(`https://api.themoviedb.org/3/movie/${id}?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
+		  		.then(function(response) {
+		      		$scope.oneVideo = response.data;
+		      		//console.log(response.data.genres);
+		  		});
+		  	}
+		});
+	</script>
 </body>
 </html>

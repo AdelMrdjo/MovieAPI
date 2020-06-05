@@ -63,15 +63,28 @@
 	<div class="rouletteModal">
 		<div class="rouletteClose" ng-click="closeRoulette()"><i class="fas fa-times"></i></div>
 		<h2>Random movie by genre</h2>
-		<div class="allGenres">
-			<button ng-click="randomMovie(genr.id)" ng-repeat="genr in genres">{{genr.name}}</button>
+		<div class="allGenres" ng-if="genreDialog">
+			<button ng-click="randomMovie(genr.id,genr.name)" ng-repeat="genr in genres">{{genr.name}}</button>
+		</div>
+		<div class="randomMovie" ng-if="randomDialog">
+			<div class="genr"><i ng-click="randomBack()" class="fas fa-chevron-left"></i><i class="fas fa-sync" ng-click="refreshRandomMovie()"></i></div>
+			<p class="lookingFor"><i class="fas fa-eye"></i> <span>{{randomSelectGenr}}</span></p>
+			<h3 class="randomTitle">{{randomMovieInfo.original_title}} [{{randomMovieInfo.release_date}}]</h3>
+			<img ng-src="https://image.tmdb.org/t/p/original{{randomMovieInfo.poster_path}}">
+			<p class="rating">Rating <span>{{randomMovieInfo.vote_average}}</span></p>
+			<p class="lang">Language <span>{{randomMovieInfo.original_language}}</span></p>
+			<hr>
+			<p class="randomOverview">{{randomMovieInfo.overview}}</p>
 		</div>
 	</div>
-	<footer><span>Movie API</span>What movie should I watch tonight?</footer>
+<!-- 	<footer><span>Movie API</span>What movie should I watch tonight?</footer> -->
 	<script>
 		var app = angular.module('myApp', []);
 		app.controller('myCtrl', function($scope, $http) {
 			$scope.limit = 6;
+			$scope.randomSelectID = 0;
+			$scope.genreDialog = false;
+			$scope.randomDialog = false;
 		  	$http.get("https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=1")
 		  		.then(function(response) {
 		      		$scope.myWelcome = response.data;
@@ -123,21 +136,24 @@
 		  					$scope.genres = response.data.genres;
 		  				}
 		  			);
-		  			$scope.randomMovie = (id) =>{
-		  				$(".rouletteModal button,.rouletteModal h2").hide();
-		  				// console.log(`ID=${id}`);
-		  				// console.log(randomTo20);
-		  				// console.log(randomTo500);
+		  			$scope.randomBack = ()=>{
+		  				$scope.randomDialog = false;
+		  				$scope.genreDialog = true;
+		  			}
+		  			$scope.refreshRandomMovie = ()=>{
+		  				$scope.randomMovie($scope.randomSelectID,$scope.randomSelectGenr);
+		  			}
+		  			$scope.randomMovie = (id,name) =>{
+		  				$scope.genreDialog = false;
+		  				$scope.randomDialog = true;
+		  				$scope.randomSelectID = id;
+		  				$scope.randomSelectGenr = name;
 		  				let randomTo20 = Math.floor((Math.random() * 20) + 1); // We have 20 movies per page
 		  				let randomTo500 = Math.floor((Math.random() * 500) + 1); // We have 500 pages per genre
 		  				$http.get(`https://api.themoviedb.org/3/discover/movie?api_key=95c61f74b09a83612c9177b0212c441f&with_genres=${id}&page=${randomTo500}`)
 		  				.then(function(response) {
-		  					console.log(response.data.results[randomTo20].original_title);
-		  					console.log(response.data.results[randomTo20].id);
-		  					// for(var x = 0; x< response.data.results.length; x++){
-		  					// 	console.log(response.data.results[x]);
-		  					// 	// console.log(response.data.results[x].id);
-		  					// }
+		  					$scope.randomMovieInfo = response.data.results[randomTo20];
+		  					$scope.randomMovieInfo.release_date = $scope.giveMeOnlyYear(response.data.results[randomTo20].release_date);
 		  				});
 		  			}
 		  	}
@@ -165,10 +181,14 @@
 		  		$scope.limit = 20;
 		  	}
 		  	$scope.showRoulette = function(){
+		  		$scope.genreDialog = true;
+		  		$scope.randomDialog = false;
 		  		if($(".movieInfo").width() > 300) $(".movieInfo").animate({width: '0px'},"fast");
 		  		$(".rouletteModal").animate({left:'50%',opacity:'1'},"normal");
 		  	}
 		  	$scope.closeRoulette = () => {
+		  		$scope.genreDialog = true;
+		  		$scope.randomDialog = false;
 		  		$(".rouletteModal").animate({left:'-50%',opacity:'0'},"normal",function(){
 		  			$(".rouletteModal").css("left","150%");
 		  		});

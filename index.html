@@ -45,6 +45,9 @@
 		<p>Popularity <span>{{oneVideo.popularity}}</span></p>
 		<p>Language <span>{{oneVideo.original_language}}</span></p>
 		<p>Rating <span>{{oneVideo.vote_average | number:1}}</span></p>
+		<div class="loadingAnim" ng-if="animSpinner">
+			<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		</div>
 	</div>
 	<div ng-if="limit == 6" class="load"><button ng-click="loadMore()">Load more...</button></div>
 	<div ng-if="limit != 6" class="pagination">
@@ -70,14 +73,17 @@
 			<div class="genr"><i ng-click="randomBack()" class="fas fa-chevron-left"></i><i class="fas fa-sync" ng-click="refreshRandomMovie()"></i></div>
 			<p class="lookingFor"><i class="fas fa-eye"></i> <span>{{randomSelectGenr}}</span></p>
 			<h3 class="randomTitle">{{randomMovieInfo.original_title}} [{{randomMovieInfo.release_date}}]</h3>
-			<img ng-src="https://image.tmdb.org/t/p/original{{randomMovieInfo.poster_path}}">
+			<img ng-if="randomImage" ng-src="https://image.tmdb.org/t/p/original{{randomMovieInfo.poster_path}}">
 			<p class="rating">Rating <span>{{randomMovieInfo.vote_average}}</span></p>
 			<p class="lang">Language <span>{{randomMovieInfo.original_language}}</span></p>
 			<hr>
 			<p class="randomOverview">{{randomMovieInfo.overview}}</p>
 		</div>
+		<div class="loadingAnim" ng-if="animSpinner">
+			<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		</div>
 	</div>
-<!-- 	<footer><span>Movie API</span>What movie should I watch tonight?</footer> -->
+
 	<script>
 		var app = angular.module('myApp', []);
 		app.controller('myCtrl', function($scope, $http) {
@@ -85,23 +91,10 @@
 			$scope.randomSelectID = 0;
 			$scope.genreDialog = false;
 			$scope.randomDialog = false;
+			$scope.animSpinner = false;
 		  	$http.get("https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=1")
 		  		.then(function(response) {
 		      		$scope.myWelcome = response.data;
-		      		//console.log(response.data);
-
-		      		//Test
-		      // 			$http.get(`https://api.themoviedb.org/3/discover/movie?api_key=95c61f74b09a83612c9177b0212c441f&with_genres=28&page=5`)
-		  				// .then(function(response) {
-		  				// 	console.log(response.data);
-		  				// 	// for(var x = 0; x< response.data.results.length; x++){
-		  				// 	// 	console.log(response.data.results[x]);
-		  				// 	// 	// console.log(response.data.results[x].id);
-		  				// 	// }
-		  				// });
-		      		
-		      		//test
-
 
 		      		$scope.refreshPagination = function(page){
 		      			$scope.currentPage = page;
@@ -145,7 +138,8 @@
 		  			}
 		  			$scope.randomMovie = (id,name) =>{
 		  				$scope.genreDialog = false;
-		  				$scope.randomDialog = true;
+		  				$scope.animSpinner = true;
+		  				$scope.randomDialog = false;
 		  				$scope.randomSelectID = id;
 		  				$scope.randomSelectGenr = name;
 		  				let randomTo20 = Math.floor((Math.random() * 20) + 1); // We have 20 movies per page
@@ -153,18 +147,27 @@
 		  				$http.get(`https://api.themoviedb.org/3/discover/movie?api_key=95c61f74b09a83612c9177b0212c441f&with_genres=${id}&page=${randomTo500}`)
 		  				.then(function(response) {
 		  					$scope.randomMovieInfo = response.data.results[randomTo20];
+		  					if(response.data.results[randomTo20].poster_path == null) $scope.randomImage = false;
+							else $scope.randomImage = true;
 		  					$scope.randomMovieInfo.release_date = $scope.giveMeOnlyYear(response.data.results[randomTo20].release_date);
-		  				});
+		  					$scope.animSpinner = false;
+		  					$scope.randomDialog = true;
+		  				})
+		  				.catch(() => {
+		  					$scope.randomMovie($scope.randomSelectID,$scope.randomSelectGenr);
+						});
 		  			}
 		  	}
 		  	$scope.getAllGenres();
 		  	});
 		  	$scope.myFunc = function(id){
+		  		$scope.animSpinner = true;
 		  		if($(".rouletteModal").css("opacity") == 1) $(".rouletteModal").animate({left:'-50%',opacity:'0'},"normal",function(){
 		  			$(".rouletteModal").css("left","150%");
 		  		});
 		  		$http.get(`https://api.themoviedb.org/3/movie/${id}?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
 		  		.then(function(response) {
+		  			$scope.animSpinner = false;
 		      		$scope.oneVideo = response.data;
 		      		$scope.oneVideo.release_date = $scope.giveMeOnlyYear(response.data.release_date);
 		      		if($(".movieInfo").width() == 0) $(".movieInfo").animate({width: '350px'},"fast");
@@ -189,6 +192,7 @@
 		  	$scope.closeRoulette = () => {
 		  		$scope.genreDialog = true;
 		  		$scope.randomDialog = false;
+		  		$scope.animSpinner = false;
 		  		$(".rouletteModal").animate({left:'-50%',opacity:'0'},"normal",function(){
 		  			$(".rouletteModal").css("left","150%");
 		  		});

@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<title>Movie API</title>
+	<link rel="icon" href="favicon.png" type="image/gif" sizes="16x16">
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
@@ -45,6 +46,18 @@
 		<p>Popularity <span>{{oneVideo.popularity}}</span></p>
 		<p>Language <span>{{oneVideo.original_language}}</span></p>
 		<p>Rating <span>{{oneVideo.vote_average | number:1}}</span></p>
+		<div class="stars">
+			<i class="fas fa-star" ng-click="setRate(1)"></i>
+			<i class="fas fa-star" ng-click="setRate(2)"></i>
+			<i class="fas fa-star" ng-click="setRate(3)"></i>
+			<i class="fas fa-star" ng-click="setRate(4)"></i>
+			<i class="fas fa-star" ng-click="setRate(5)"></i>
+			<i class="fas fa-star" ng-click="setRate(6)"></i>
+			<i class="fas fa-star" ng-click="setRate(7)"></i>
+			<i class="fas fa-star" ng-click="setRate(8)"></i>
+			<i class="fas fa-star" ng-click="setRate(9)"></i>
+			<i class="fas fa-star" ng-click="setRate(10)"></i>
+		</div>
 		<div class="loadingAnim" ng-if="animSpinner">
 			<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 		</div>
@@ -123,6 +136,13 @@
 		      					$scope.myWelcome = response.data;
 		      			});
 		      		}
+					$scope.setRate = (star)=>{
+						localStorage.setItem($scope.oneVideo.id,star);
+						$(".stars i").css("color","#c7c7c7");
+						for(var k=1;k<=star;k++){
+							$(`.stars i:nth-child(${k})`).css("color","#03a9f4");
+						}
+					}
 		  			$scope.getAllGenres = function(){
 		  				$http.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
 		  				.then(function(response) {
@@ -171,6 +191,10 @@
 		      		$scope.oneVideo = response.data;
 		      		$scope.oneVideo.release_date = $scope.giveMeOnlyYear(response.data.release_date);
 		      		if($(".movieInfo").width() == 0) $(".movieInfo").animate({width: '350px'},"fast");
+		      		$(".stars i").css("color","#c7c7c7");
+					for(var k=1;k<=localStorage.getItem(id);k++){
+						$(`.stars i:nth-child(${k})`).css("color","#03a9f4");
+					}
 		  		});
 		  	}
 		  	$scope.giveMeOnlyYear = function(date){

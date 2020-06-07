@@ -87,7 +87,7 @@
 			<p class="lookingFor"><i class="fas fa-eye"></i> <span>{{randomSelectGenr}}</span></p>
 			<h3 class="randomTitle">{{randomMovieInfo.original_title}} [{{randomMovieInfo.release_date}}]</h3>
 			<img ng-if="randomImage" ng-src="https://image.tmdb.org/t/p/original{{randomMovieInfo.poster_path}}">
-			<p class="rating">Rating <span>{{randomMovieInfo.vote_average}}</span></p>
+			<p class="rating">Rating <span>{{randomMovieInfo.vote_average | number:1}}</span></p>
 			<p class="lang">Language <span>{{randomMovieInfo.original_language}}</span></p>
 			<hr>
 			<p class="randomOverview">{{randomMovieInfo.overview}}</p>

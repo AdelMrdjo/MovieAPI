@@ -4,16 +4,16 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<title>Movie API</title>
-	<link rel="icon" href="favicon.png" type="image/gif" sizes="16x16">
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="icon" href="img/favicon.png" type="image/gif" sizes="16x16">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 </head>
 <body ng-app="myApp" ng-controller="myCtrl">
-	<div class="cover">
+	<div class="cover"><!-- ========COVER WITH IMAGE======== -->
 		<h2>WHAT MOVIE<br>SHOULD I WATCH<br>TONIGHT?</h2>
 	</div>
-	<div class="pagination">
+	<div class="pagination"><!-- =======TOP PAGINATION=========== -->
 		<button ng-if="currentPage != pg1" ng-click="newPage(pg1)">{{pg1}}</button>
 		<span ng-if="currentPage == pg1">{{pg1}}</span>
 		<button ng-if="currentPage != pg2" ng-click="newPage(pg2)">{{pg2}}</button>
@@ -25,18 +25,18 @@
 		<button ng-if="currentPage != pg5" ng-click="newPage(pg5)">{{pg5}}</button>
 		<span ng-if="currentPage == pg5">{{pg5}}</span>
 	</div>
-	<div class="container">
+	<div class="container"><!-- =======MAIN CONTAINER WITH MOVIES=========== -->
 		<div class="card" ng-repeat="x in myWelcome.results | limitTo: limit">
 			<div class="logo"><img ng-src="https://image.tmdb.org/t/p/original{{x.poster_path}}"></div>
 			<div class="contentBx">
 				<h2>{{x.original_title}}</h2>
 				<p>Language <span>{{x.original_language}}</span></p>
 				<p>Rating <span>{{x.vote_average | number:1}}</span></p>
-				<button ng-click="myFunc(x.id)">Read more</button>
+				<button ng-click="readMore(x.id)">Read more</button>
 			</div>
 		</div>
 	</div>
-	<div class="movieInfo">
+	<div class="movieInfo"><!-- ========LEFT SIDE MOVIE INFORMATION=========== -->
 		<button ng-click="closeTab()">X</button>
 		<img ng-src="https://image.tmdb.org/t/p/original{{oneVideo.poster_path}}">
 		<h3>{{oneVideo.original_title}} [{{oneVideo.release_date}}]</h3>
@@ -63,7 +63,7 @@
 		</div>
 	</div>
 	<div ng-if="limit == 6" class="load"><button ng-click="loadMore()">Load more...</button></div>
-	<div ng-if="limit != 6" class="pagination">
+	<div ng-if="limit != 6" class="pagination"><!-- ==========BOTTOM NAVIGATION========== -->
 		<button ng-if="currentPage != pg1" ng-click="newPage(pg1)">{{pg1}}</button>
 		<span ng-if="currentPage == pg1">{{pg1}}</span>
 		<button ng-if="currentPage != pg2" ng-click="newPage(pg2)">{{pg2}}</button>
@@ -76,13 +76,13 @@
 		<span ng-if="currentPage == pg5">{{pg5}}</span>
 	</div>
 	<div class="roulette" ng-click="showRoulette()"><i class="fas fa-random"></i></div>
-	<div class="rouletteModal">
+	<div class="rouletteModal"><!-- ==========ROULETTE DIALOG============= -->
 		<div class="rouletteClose" ng-click="closeRoulette()"><i class="fas fa-times"></i></div>
 		<h2>Random movie by genre</h2>
-		<div class="allGenres" ng-if="genreDialog">
+		<div class="allGenres" ng-if="genreDialog"><!-- ==========SHOW ALL GENRES=========== -->
 			<button ng-click="randomMovie(genr.id,genr.name)" ng-repeat="genr in genres">{{genr.name}}</button>
 		</div>
-		<div class="randomMovie" ng-if="randomDialog">
+		<div class="randomMovie" ng-if="randomDialog"><!-- =========RANDOM MOVIE INFORMATION============== -->
 			<div class="genr"><i ng-click="randomBack()" class="fas fa-chevron-left"></i><i class="fas fa-sync" ng-click="refreshRandomMovie()"></i></div>
 			<p class="lookingFor"><i class="fas fa-eye"></i> <span>{{randomSelectGenr}}</span></p>
 			<h3 class="randomTitle">{{randomMovieInfo.original_title}} [{{randomMovieInfo.release_date}}]</h3>
@@ -96,132 +96,6 @@
 			<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 		</div>
 	</div>
-
-	<script>
-		var app = angular.module('myApp', []);
-		app.controller('myCtrl', function($scope, $http) {
-			$scope.limit = 6;
-			$scope.randomSelectID = 0;
-			$scope.genreDialog = false;
-			$scope.randomDialog = false;
-			$scope.animSpinner = false;
-		  	$http.get("https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=1")
-		  		.then(function(response) {
-		      		$scope.myWelcome = response.data;
-
-		      		$scope.refreshPagination = function(page){
-		      			$scope.currentPage = page;
-		      			if($scope.currentPage > 0 && $scope.currentPage < 4){
-			      			$scope.pg1 = 1;
-			      			$scope.pg2 = 2;
-			      			$scope.pg3 = 3;
-			      			$scope.pg4 = 4;
-			      			$scope.pg5 = 5;
-			      		}else{
-			      			$scope.pg1 = $scope.currentPage-2;
-			      			$scope.pg2 = $scope.currentPage-1;
-			      			$scope.pg3 = $scope.currentPage;
-			      			$scope.pg4 = $scope.currentPage+1;
-			      			$scope.pg5 = $scope.currentPage+2;
-			      		}
-		      		}
-		      		$scope.currentPage = 1;
-		      		$scope.refreshPagination($scope.currentPage);
-		      		$scope.newPage = function(page){
-		      			$scope.limit = 6;
-		      			$scope.currentPage = page;
-		      			$scope.refreshPagination($scope.currentPage);
-		      			$http.get(`https://api.themoviedb.org/3/movie/popular?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US&page=${page}`)
-		  				.then(function(response) {
-		      					$scope.myWelcome = response.data;
-		      			});
-		      		}
-					$scope.setRate = (star)=>{
-						localStorage.setItem($scope.oneVideo.id,star);
-						$(".stars i").css("color","#c7c7c7");
-						for(var k=1;k<=star;k++){
-							$(`.stars i:nth-child(${k})`).css("color","#03a9f4");
-						}
-					}
-		  			$scope.getAllGenres = function(){
-		  				$http.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
-		  				.then(function(response) {
-		  					$scope.genres = response.data.genres;
-		  				}
-		  			);
-		  			$scope.randomBack = ()=>{
-		  				$scope.randomDialog = false;
-		  				$scope.genreDialog = true;
-		  			}
-		  			$scope.refreshRandomMovie = ()=>{
-		  				$scope.randomMovie($scope.randomSelectID,$scope.randomSelectGenr);
-		  			}
-		  			$scope.randomMovie = (id,name) =>{
-		  				$scope.genreDialog = false;
-		  				$scope.animSpinner = true;
-		  				$scope.randomDialog = false;
-		  				$scope.randomSelectID = id;
-		  				$scope.randomSelectGenr = name;
-		  				let randomTo20 = Math.floor((Math.random() * 20) + 1); // We have 20 movies per page
-		  				let randomTo500 = Math.floor((Math.random() * 500) + 1); // We have 500 pages per genre
-		  				$http.get(`https://api.themoviedb.org/3/discover/movie?api_key=95c61f74b09a83612c9177b0212c441f&with_genres=${id}&page=${randomTo500}`)
-		  				.then(function(response) {
-		  					$scope.randomMovieInfo = response.data.results[randomTo20];
-		  					if(response.data.results[randomTo20].poster_path == null) $scope.randomImage = false;
-							else $scope.randomImage = true;
-		  					$scope.randomMovieInfo.release_date = $scope.giveMeOnlyYear(response.data.results[randomTo20].release_date);
-		  					$scope.animSpinner = false;
-		  					$scope.randomDialog = true;
-		  				})
-		  				.catch(() => {
-		  					$scope.randomMovie($scope.randomSelectID,$scope.randomSelectGenr);
-						});
-		  			}
-		  	}
-		  	$scope.getAllGenres();
-		  	});
-		  	$scope.myFunc = function(id){
-		  		$scope.animSpinner = true;
-		  		if($(".rouletteModal").css("opacity") == 1) $(".rouletteModal").animate({left:'-50%',opacity:'0'},"normal",function(){
-		  			$(".rouletteModal").css("left","150%");
-		  		});
-		  		$http.get(`https://api.themoviedb.org/3/movie/${id}?api_key=95c61f74b09a83612c9177b0212c441f&language=en-US`)
-		  		.then(function(response) {
-		  			$scope.animSpinner = false;
-		      		$scope.oneVideo = response.data;
-		      		$scope.oneVideo.release_date = $scope.giveMeOnlyYear(response.data.release_date);
-		      		if($(".movieInfo").width() == 0) $(".movieInfo").animate({width: '350px'},"fast");
-		      		$(".stars i").css("color","#c7c7c7");
-					for(var k=1;k<=localStorage.getItem(id);k++){
-						$(`.stars i:nth-child(${k})`).css("color","#03a9f4");
-					}
-		  		});
-		  	}
-		  	$scope.giveMeOnlyYear = function(date){
-		  		var res = date.split("-");
-		  		return res[0];
-		  	}
-		  	$scope.closeTab = function(){
-		  		$(".movieInfo").animate({width: '0px'},"fast");
-		  	}
-		  	$scope.loadMore = () => {
-		  		$scope.limit = 20;
-		  	}
-		  	$scope.showRoulette = function(){
-		  		$scope.genreDialog = true;
-		  		$scope.randomDialog = false;
-		  		if($(".movieInfo").width() > 300) $(".movieInfo").animate({width: '0px'},"fast");
-		  		$(".rouletteModal").animate({left:'50%',opacity:'1'},"normal");
-		  	}
-		  	$scope.closeRoulette = () => {
-		  		$scope.genreDialog = true;
-		  		$scope.randomDialog = false;
-		  		$scope.animSpinner = false;
-		  		$(".rouletteModal").animate({left:'-50%',opacity:'0'},"normal",function(){
-		  			$(".rouletteModal").css("left","150%");
-		  		});
-		  	}
-		});
-	</script>
+	<script type="text/javascript" src="js/index.js"></script>
 </body>
 </html>
